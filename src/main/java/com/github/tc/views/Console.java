@@ -1,0 +1,62 @@
+/*
+ * Copyright 2019-2119 gao_xianglong@sina.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.tc.views;
+
+import com.github.tc.core.Timer;
+import picocli.CommandLine;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * @author gao_xianglong@sina.com
+ * @version 0.1-SNAPSHOT
+ * @date created in 2022/5/25 23:29
+ */
+@CommandLine.Command(name = "time_control", footer = "Copyright(c) 2021 - 2031 gaoxianglong. All Rights Reserved.", version = Constants.VERSION, mixinStandardHelpOptions = true)
+public class Console implements Runnable {
+    @CommandLine.Option(names = {"-n", "--task-name"}, description = "A specific name that focuses on doing something.")
+    private String taskName = "test";
+
+    @CommandLine.Option(names = {"-t", "--time-consuming"}, description = "How long does it take to do something.")
+    private Integer timeConsuming = 1;
+
+    @CommandLine.Option(names = {"-u", "--time-unit"}, description = "Hour and minute.")
+    private String timeUnit = "m";
+
+    @CommandLine.Option(names = {"-c", "--count"}, description = "Whether to count the time.")
+    private boolean count;
+
+    @CommandLine.Option(names = {"-d", "--date"}, description = "Data statistics based on date.")
+    private String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+    @Override
+    public void run() {
+        var param = new ParamDTO();
+        param.setTaskName(taskName);
+        param.setTimeConsuming(timeConsuming);
+        param.setTimeUnit(timeUnit);
+        param.setKey(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+        param.setDate(date);
+        param.setCount(count);
+        System.out.println("Start your study and work...");
+        try {
+            new Timer(param).start();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+}
