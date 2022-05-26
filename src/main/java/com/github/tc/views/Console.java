@@ -16,6 +16,8 @@
 package com.github.tc.views;
 
 import com.github.tc.core.Timer;
+import com.github.tc.utils.Constants;
+import com.github.tc.utils.Utils;
 import picocli.CommandLine;
 
 import java.text.SimpleDateFormat;
@@ -28,20 +30,20 @@ import java.util.Date;
  */
 @CommandLine.Command(name = "time_control", footer = "Copyright(c) 2021 - 2031 gaoxianglong. All Rights Reserved.", version = Constants.VERSION, mixinStandardHelpOptions = true)
 public class Console implements Runnable {
-    @CommandLine.Option(names = {"-n", "--task-name"}, description = "A specific name that focuses on doing something.")
+    @CommandLine.Option(names = {"-n", "--task-name"}, description = "具体的任务名称.")
     private String taskName = "test";
 
-    @CommandLine.Option(names = {"-t", "--time-consuming"}, description = "How long does it take to do something.")
+    @CommandLine.Option(names = {"-t", "--time-consuming"}, description = "你预计花多少时间来完成这项任务.")
     private Integer timeConsuming = 1;
 
-    @CommandLine.Option(names = {"-u", "--time-unit"}, description = "Hour and minute.")
+    @CommandLine.Option(names = {"-u", "--time-unit"}, description = "对应--time-consuming的时间参数, 只能是h或m.")
     private String timeUnit = "m";
 
-    @CommandLine.Option(names = {"-c", "--count"}, description = "Whether to count the time.")
+    @CommandLine.Option(names = {"-c", "--count"}, description = "是否统计以天为单位的任务耗时.")
     private boolean count;
 
-    @CommandLine.Option(names = {"-d", "--date"}, description = "Data statistics based on date.")
-    private String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    @CommandLine.Option(names = {"-d", "--date"}, description = "配合-count参数使用, 格式为yyyy-MM-dd，如果不指定则缺省为当前日期.")
+    private String date = Utils.getDate();
 
     @Override
     public void run() {
@@ -49,10 +51,9 @@ public class Console implements Runnable {
         param.setTaskName(taskName);
         param.setTimeConsuming(timeConsuming);
         param.setTimeUnit(timeUnit);
-        param.setKey(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+        param.setKey(Utils.getDate());
         param.setDate(date);
         param.setCount(count);
-        System.out.println("Start your study and work...");
         try {
             new Timer(param).start();
         } catch (Throwable throwable) {

@@ -15,7 +15,8 @@
  */
 package com.github.tc.utils;
 
-import com.github.tc.views.Constants;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author gao_xianglong@sina.com
@@ -46,13 +47,39 @@ public class Utils {
      */
     public static String timeFormat(long time) {
         var result = new StringBuilder();
-        var hour = time / com.github.tc.views.Constants.HOUR;
-        time -= hour * com.github.tc.views.Constants.HOUR;
-        var min = time / com.github.tc.views.Constants.MINUTE;
+        var hour = time / Constants.HOUR;
+        time -= hour * Constants.HOUR;
+        var min = time / Constants.MINUTE;
         time -= min * Constants.MINUTE;
         result.append(String.format("%02d", hour)).append(":").
                 append(String.format("%02d", min)).append(":").
                 append(String.format("%02d", time));
         return result.toString();
+    }
+
+    /**
+     * 获取当前日期
+     *
+     * @return
+     */
+    public static String getDate() {
+        return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    }
+
+    public static String getProgressBar(double value) {
+        var percent = (int) value;
+        percent = (0 == percent) ? 1 : percent;
+        var str = new StringBuilder();
+        str.append("[");
+        var length = 20 - percent;
+        for (int i = 0; i < percent; i++) {
+            str.append(">");
+        }
+        // 空位补空格占位
+        for (int j = 0; j < length; j++) {
+            str.append(" ");
+        }
+        str.append("]");
+        return str.toString();
     }
 }

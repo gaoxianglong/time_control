@@ -15,14 +15,13 @@
  */
 package com.github.tc.core;
 
+import com.github.tc.utils.Constants;
 import com.github.tc.utils.Utils;
-import com.github.tc.views.Constants;
 import com.github.tc.views.ParamDTO;
 
 import javax.swing.*;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author gao_xianglong@sina.com
@@ -48,65 +47,48 @@ public class Timer {
     public void start() throws Throwable {
         if (paramDTO.isCount()) {
             var r = statistics(paramDTO.getDate());
-            System.out.println(Objects.isNull(r) ? "No data found" : r);
+            if (r) {
+                System.out.printf("无法找到%s的统计数据", paramDTO.getDate());
+            }
             return;
         }
+        System.out.printf("正在开始你的[%s]学习计划...", paramDTO.getTaskName());
         remind();
         var begin = System.currentTimeMillis();
         System.in.read();
         var tc = (System.currentTimeMillis() - begin) / 1000L;
         var tcs = Utils.timeFormat(tc);
         calculation(tc);
-        System.out.printf("End of task\nStudy time:%s", tcs);
+        System.out.printf("==任务结束==\n学习时常:%s", tcs);
     }
 
     private void calculation(long tc) throws Throwable {
         var properties = new Properties();
-        var path = Constants.FILE_PATH;
-        var key = paramDTO.getKey();
-        properties.load(new FileReader(Constants.FILE_PATH));
-        var value = properties.getProperty(key);
-        if (Objects.isNull(value) || value.isBlank()) {
-            value = String.format("%s,%s&", paramDTO.getTaskName(), tc);
+        var fp = Constants.FILE_PATH;
+        var key = paramDTO.getTaskName();
+        properties.load(new BufferedReader(new FileReader(fp)));
+        if (properties.containsKey(key)) {
+            properties.put(key, String.valueOf(Long.parseLong(properties.getProperty(key)) + tc));
         } else {
-            value = String.format("%s%s,%s&", value, paramDTO.getTaskName(), tc);
+            properties.put(key, String.valueOf(tc));
         }
-        properties.put(key, value);
-        properties.store(new FileOutputStream(Constants.FILE_PATH), null);
+        properties.store(new BufferedWriter(new FileWriter(Constants.FILE_PATH)), null);
     }
 
-    private String statistics(String key) throws Throwable {
-        System.out.printf(">>>total study time<<<\ndate:%s\n", key);
-        var count = new ConcurrentHashMap<String, Long>();
+    private boolean statistics(String key) throws Throwable {
+        System.out.printf(">>> %s总学习时常 <<<\n", key);
         var properties = new Properties();
         properties.load(new FileReader(Constants.FILE_PATH));
-        if (!properties.containsKey(key)) {
-            return null;
-        }
-        var total = 0;
-        var value = properties.getProperty(key);
-        value = value.substring(0, value.length() - 1);
-        for (var t1 : value.split("\\&")) {
-            var t2 = t1.split("\\,");
-            var k = t2[0];
-            var v = t2[1];
-            count.put(k, count.containsKey(k) ? count.get(k) + Long.parseLong(v)
-                    : Long.parseLong(v));
-        }
-        for (Map.Entry<String, Long> entry : count.entrySet()) {
-            total += entry.getValue();
-        }
-        var strBuilder = new StringBuffer();
-        var i = 0;
-        for (Map.Entry<String, Long> entry : count.entrySet()) {
+        var t = properties.values().stream().mapToLong(x -> Long.parseLong(String.valueOf(x))).sum();
+        System.out.printf("总学习时常:%s\n", Utils.timeFormat(t));
+        System.out.printf("%12.6s%22.6s%9.6s\n", "(时间占比)", "(学习时常)", "(任务名称)");
+        for (Map.Entry<?, ?> entry : properties.entrySet()) {
             var k = entry.getKey();
-            var v = entry.getValue();
-            strBuilder.append(String.format("%s.category:[%s], proportion:%s, study time:%s\n",
-                    ++i, k, String.format("%.2f", (double) v / total * 100)
-                            + "%", Utils.timeFormat(v)));
+            var v = Long.parseLong(String.valueOf(entry.getValue()));
+            System.out.printf("%s%-6.6s | %s | %s\n", Utils.getProgressBar((double) v / t * 20),
+                    String.format("%.2f", (double) v / t * 100) + "%", Utils.timeFormat(v), k);
         }
-        strBuilder.append(String.format("total:%s", Utils.timeFormat(total)));
-        return strBuilder.toString();
+        return properties.isEmpty();
     }
 
     private void create() throws IOException {
@@ -125,7 +107,7 @@ public class Timer {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(null,
-                        String.format("[%s] task time is up", paramDTO.getTaskName()));
+                        String.format("[%s] 任务学习时间已到", paramDTO.getTaskName()));
             }
         }, Utils.toMillisecond(paramDTO.getTimeConsuming(), paramDTO.getTimeUnit()));
     }
