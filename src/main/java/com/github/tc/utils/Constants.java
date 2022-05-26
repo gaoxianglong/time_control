@@ -32,5 +32,5 @@ public class Constants {
      */
     public static final int MINUTE = 0x3c;
     public static final String PATH = String.format("%s/tc", System.getProperty("user.home"));
-    public static final String FILE_PATH = String.format("%s/time-%s.properties", PATH, Utils.getDate());
+    public static final String DEFAULT_FILE_PATH = String.format("%s/time-%s.properties", PATH, Utils.getDate());
 }

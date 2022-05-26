@@ -31,10 +31,10 @@ import java.util.Date;
 @CommandLine.Command(name = "time_control", footer = "Copyright(c) 2021 - 2031 gaoxianglong. All Rights Reserved.", version = Constants.VERSION, mixinStandardHelpOptions = true)
 public class Console implements Runnable {
     @CommandLine.Option(names = {"-n", "--task-name"}, description = "具体的任务名称.")
-    private String taskName = "test";
+    private String taskName = "通用学习";
 
-    @CommandLine.Option(names = {"-t", "--time-consuming"}, description = "你预计花多少时间来完成这项任务.")
-    private Integer timeConsuming = 1;
+    @CommandLine.Option(names = {"-t", "--time-consuming"}, description = "你预计花多少时间来完成这项任务，缺省25分钟触发提醒.")
+    private Integer timeConsuming = 25;
 
     @CommandLine.Option(names = {"-u", "--time-unit"}, description = "对应--time-consuming的时间参数, 只能是h或m.")
     private String timeUnit = "m";
