@@ -95,7 +95,7 @@ public class Timer {
         }
         var properties = new Properties();
         properties.load(new FileReader(p));
-        System.out.printf("\n>>> %s总学习时常 <<<\n", key);
+        System.out.printf("\n>>> %s学习时常统计 <<<\n", key);
         var t = properties.values().stream().mapToLong(x -> Long.parseLong(String.valueOf(x))).sum();
 //        System.out.printf("%12.6s%22.6s%9.6s\n", "(时间占比)", "(学习时常)", "(任务名称)");
         System.out.println("(时间占比) | (学习时常) | (任务名称)");
