@@ -16,6 +16,7 @@
 package com.github.tc.utils;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -64,6 +65,19 @@ public class Utils {
      */
     public static String getDate() {
         return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    }
+
+    /**
+     * 获取前一天
+     *
+     * @return
+     */
+    public static String getYesterdayDate() {
+        var calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        //计算前一个月的日期
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        return new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
     }
 
     public static String getProgressBar(double value) {

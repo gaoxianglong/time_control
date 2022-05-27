@@ -93,17 +93,27 @@ public class Timer {
         if (!new File(p).exists()) {
             return;
         }
+        // 前一天数据
+        var before = getYesterdayData();
         var properties = new Properties();
         properties.load(new FileReader(p));
         System.out.printf("\n>>> %s学习时常统计 <<<\n", key);
         var t = properties.values().stream().mapToLong(x -> Long.parseLong(String.valueOf(x))).sum();
-//        System.out.printf("%12.6s%22.6s%9.6s\n", "(时间占比)", "(学习时常)", "(任务名称)");
-        System.out.println("(时间占比) | (学习时常) | (任务名称)");
+        System.out.println("(时间占比) | (学习时常) | (同比增长) | (任务名称)");
         for (Map.Entry<?, ?> entry : properties.entrySet()) {
             var k = entry.getKey();
             var v = Long.parseLong(String.valueOf(entry.getValue()));
-            System.out.printf("%s%-6.6s | %s | %s\n", Utils.getProgressBar((double) v / t * 20),
-                    String.format("%.2f", (double) v / t * 100) + "%", Utils.timeFormat(v), k);
+            System.out.printf("%s%-6.6s", Utils.getProgressBar((double) v / t * 20),
+                    String.format("%.2f", (double) v / t * 100) + "%");
+            System.out.printf(" | %s", Utils.timeFormat(v));
+            if (before.containsKey(k)) {
+                var bv = Long.parseLong(String.valueOf(before.get(k)));
+                var r = (double) (v - bv) / bv * 100;
+                System.out.printf(" | %s%-7.7s", r >= 0 ? "↑ " : "↓ ", String.format("%.2f", Math.abs(r)) + "%");
+            } else {
+                System.out.printf(" | %-9.7s", "0" + "%");
+            }
+            System.out.printf(" | %s\n", k);
         }
         System.out.printf("总学习时常:%s\n", Utils.timeFormat(t));
     }
@@ -117,6 +127,21 @@ public class Timer {
         if (!file.exists()) {
             file.createNewFile();
         }
+    }
+
+    /**
+     * 获取前一天的数据
+     *
+     * @return
+     */
+    private Properties getYesterdayData() throws Throwable {
+        var properties = new Properties();
+        var yd = Utils.getYesterdayDate();
+        var p = String.format("%s/time-%s.properties", Constants.PATH, yd);
+        if (new File(p).exists()) {
+            properties.load(new BufferedReader(new FileReader(p)));
+        }
+        return properties;
     }
 
     public void remind() {
