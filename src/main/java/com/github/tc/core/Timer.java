@@ -21,6 +21,7 @@ import com.github.tc.views.ParamDTO;
 
 import javax.swing.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -111,7 +112,7 @@ public class Timer {
                 var r = (double) (v - bv) / bv * 100;
                 System.out.printf(" | %s%-7.7s", r >= 0 ? "↑ " : "↓ ", String.format("%.2f", Math.abs(r)) + "%");
             } else {
-                System.out.printf(" | %-9.7s", "0" + "%");
+                System.out.printf(" | %-9.7s", "0.00" + "%");
             }
             System.out.printf(" | %s\n", k);
         }
@@ -136,7 +137,9 @@ public class Timer {
      */
     private Properties getYesterdayData() throws Throwable {
         var properties = new Properties();
-        var yd = Utils.getYesterdayDate();
+        Date date = Objects.isNull(paramDTO.getDate()) ? new Date() :
+                new SimpleDateFormat("yyyy-MM-dd").parse(paramDTO.getDate());
+        var yd = Utils.getYesterdayDate(date);
         var p = String.format("%s/time-%s.properties", Constants.PATH, yd);
         if (new File(p).exists()) {
             properties.load(new BufferedReader(new FileReader(p)));

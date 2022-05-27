@@ -68,13 +68,14 @@ public class Utils {
     }
 
     /**
-     * 获取前一天
+     * 获取指定时间的前一天
      *
+     * @param date
      * @return
      */
-    public static String getYesterdayDate() {
+    public static String getYesterdayDate(Date date) {
         var calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+        calendar.setTime(date);
         //计算前一个月的日期
         calendar.add(Calendar.DAY_OF_MONTH, -1);
         return new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
