@@ -48,7 +48,13 @@ public class Timer {
 
     public void start() throws Throwable {
         if (paramDTO.isCount()) {
-            statistics(paramDTO.getDate());
+            for (var i = 0; i < paramDTO.getDays(); i++) {
+                statistics(paramDTO.getDate());
+                if (paramDTO.getDays() > 1) {
+                    paramDTO.setDate(Utils.getYesterdayDate(
+                            new SimpleDateFormat("yyyy-MM-dd").parse(paramDTO.getDate())));
+                }
+            }
             return;
         }
         System.out.printf("正在进行你的[%s]学习计划...\n", paramDTO.getTaskName());
@@ -100,7 +106,7 @@ public class Timer {
         properties.load(new FileReader(p));
         System.out.printf("\n>>> %s学习时常统计 <<<\n", key);
         var t = properties.values().stream().mapToLong(x -> Long.parseLong(String.valueOf(x))).sum();
-        System.out.println("(时间占比) | (学习时常) | (同比增长) | (任务名称)");
+        System.out.println("(时间占比) | (学习时常) | (环比增长) | (任务名称)");
         for (Map.Entry<?, ?> entry : properties.entrySet()) {
             var k = entry.getKey();
             var v = Long.parseLong(String.valueOf(entry.getValue()));

@@ -30,4 +30,5 @@ public class ParamDTO {
     private String key;
     private String date;
     private boolean count;
+    private Integer days;
 }

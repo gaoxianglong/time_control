@@ -45,19 +45,31 @@ public class Console implements Runnable {
     @CommandLine.Option(names = {"-d", "--date"}, description = "配合-count参数使用, 格式为yyyy-MM-dd，如果不指定则缺省为当前日期.")
     private String date = Utils.getDate();
 
+    @CommandLine.Option(names = {"-s", "--days"}, description = "统计多少天的数据，缺省1天, 最大统计天数不能超过30天.")
+    private Integer days = 1;
+
+
     @Override
     public void run() {
-        var param = new ParamDTO();
-        param.setTaskName(taskName);
-        param.setTimeConsuming(timeConsuming);
-        param.setTimeUnit(timeUnit);
-        param.setKey(Utils.getDate());
-        param.setDate(date);
-        param.setCount(count);
         try {
+            check();
+            var param = new ParamDTO();
+            param.setTaskName(taskName);
+            param.setTimeConsuming(timeConsuming);
+            param.setTimeUnit(timeUnit);
+            param.setKey(Utils.getDate());
+            param.setDate(date);
+            param.setCount(count);
+            param.setDays(days);
             new Timer(param).start();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
+        }
+    }
+
+    private void check() throws Throwable {
+        if (days < 1 || days > 30) {
+            throw new Throwable("--days属性值只能设置为1~30天");
         }
     }
 }
