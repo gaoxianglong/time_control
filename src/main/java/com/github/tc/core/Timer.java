@@ -48,13 +48,15 @@ public class Timer {
 
     public void start() throws Throwable {
         if (paramDTO.isCount()) {
-            for (var i = 0; i < paramDTO.getDays(); i++) {
+            var days = paramDTO.getDays();
+            do {
                 statistics(paramDTO.getDate());
                 if (paramDTO.getDays() > 1) {
                     paramDTO.setDate(Utils.getYesterdayDate(
-                            new SimpleDateFormat("yyyy-MM-dd").parse(paramDTO.getDate())));
+                            new SimpleDateFormat("yyyy-MM-dd").
+                                    parse(paramDTO.getDate())));
                 }
-            }
+            } while (--days > 0);
             return;
         }
         System.out.printf("正在进行你的[%s]学习计划...\n", paramDTO.getTaskName());
@@ -106,12 +108,12 @@ public class Timer {
         properties.load(new FileReader(p));
         System.out.printf("\n>>> %s学习时常统计 <<<\n", key);
         var t = properties.values().stream().mapToLong(x -> Long.parseLong(String.valueOf(x))).sum();
-        System.out.println("(时间占比) | (学习时常) | (环比增长) | (任务名称)");
+        System.out.println("(时间占比) | (学习时常) | (环比增长率) | (任务名称)");
         for (Map.Entry<?, ?> entry : properties.entrySet()) {
             var k = entry.getKey();
             var v = Long.parseLong(String.valueOf(entry.getValue()));
-            System.out.printf("%s%-6.6s", Utils.getProgressBar((double) v / t * 20),
-                    String.format("%.2f", (double) v / t * 100) + "%");
+            System.out.printf("%s", Utils.getProgressBar((double) v / t * 20));
+            System.out.printf("%-7.7s", String.format("%.2f", (double) v / t * 100) + "%");
             System.out.printf(" | %s", Utils.timeFormat(v));
             if (before.containsKey(k)) {
                 var bv = Long.parseLong(String.valueOf(before.get(k)));
