@@ -15,6 +15,7 @@
  */
 package com.github.tc.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,13 +59,24 @@ public class Utils {
         return result.toString();
     }
 
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
     /**
      * 获取当前日期
      *
      * @return
      */
     public static String getDate() {
-        return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        return format.format(new Date());
+    }
+
+    public static long parse(String str) throws ParseException {
+        return format.parse(str).getTime();
+    }
+
+    public static long getLastTime(String str) throws ParseException {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").
+                parse(String.format("%s 23:59:59", str)).getTime();
     }
 
     /**
@@ -78,7 +90,7 @@ public class Utils {
         calendar.setTime(date);
         //计算前一个月的日期
         calendar.add(Calendar.DAY_OF_MONTH, -1);
-        return new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+        return format.format(calendar.getTime());
     }
 
     public static String getProgressBar(double value) {

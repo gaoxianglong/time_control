@@ -31,7 +31,10 @@ import java.util.concurrent.TimeUnit;
  * @date created in 2022/5/25 23:45
  */
 public class Timer {
+    private long begin;
+    private String fp = Constants.DEFAULT_FILE_PATH;
     private ParamDTO paramDTO;
+    private String cd = Utils.getDate();
 
     public Timer(ParamDTO paramDTO) {
         this.paramDTO = paramDTO;
@@ -61,12 +64,24 @@ public class Timer {
         }
         System.out.printf("正在进行你的[%s]学习计划...\n", paramDTO.getTaskName());
         remind();
-        var begin = System.currentTimeMillis();
+        begin = System.currentTimeMillis();
         record(begin);
         System.in.read();
         var tc = (System.currentTimeMillis() - begin) / 1000L;
         calculation(tc);
         System.out.println("bye~");
+    }
+
+    private void monitor() throws Throwable {
+        // 如果当前日期大于启动日期就落盘前一天数据
+        if (Utils.parse(Utils.getDate()) > Utils.parse(cd)) {
+            var tc = (Utils.getLastTime(cd) - begin) / 1000L;
+            // 落盘前一天数据
+            calculation(tc);
+            begin = System.currentTimeMillis();
+            fp = String.format("%s/time-%s.properties", Constants.PATH, Utils.getDate());
+            create(fp);
+        }
     }
 
     private void record(long begin) {
@@ -77,7 +92,8 @@ public class Timer {
                     System.out.printf("已学习%s",
                             Utils.timeFormat((System.currentTimeMillis() - begin) / 1000L));
                     System.out.print("\r");
-                } catch (InterruptedException e) {
+                    monitor();
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }
@@ -86,7 +102,6 @@ public class Timer {
 
     private void calculation(long tc) throws Throwable {
         var properties = new Properties();
-        var fp = Constants.DEFAULT_FILE_PATH;
         var key = paramDTO.getTaskName();
         properties.load(new BufferedReader(new FileReader(fp)));
         if (properties.containsKey(key)) {
@@ -94,7 +109,7 @@ public class Timer {
         } else {
             properties.put(key, String.valueOf(tc));
         }
-        properties.store(new BufferedWriter(new FileWriter(Constants.DEFAULT_FILE_PATH)), null);
+        properties.store(new BufferedWriter(new FileWriter(fp)), null);
     }
 
     private void statistics(String key) throws Throwable {
@@ -128,11 +143,15 @@ public class Timer {
     }
 
     private void create() throws IOException {
+        create(fp);
+    }
+
+    private void create(String path) throws IOException {
         var file = new File(Constants.PATH);
         if (!file.exists()) {
             file.mkdirs();
         }
-        file = new File(Constants.DEFAULT_FILE_PATH);
+        file = new File(path);
         if (!file.exists()) {
             file.createNewFile();
         }
