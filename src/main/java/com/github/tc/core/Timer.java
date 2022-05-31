@@ -79,6 +79,7 @@ public class Timer {
             // 落盘前一天数据
             calculation(tc);
             begin = System.currentTimeMillis();
+            cd = Utils.getDate();
             fp = String.format("%s/time-%s.properties", Constants.PATH, Utils.getDate());
             create(fp);
         }
