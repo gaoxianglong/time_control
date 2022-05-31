@@ -18,9 +18,6 @@ package com.github.tc;
 import com.github.tc.views.Console;
 import picocli.CommandLine;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author gao_xianglong@sina.com
  * @version 0.1-SNAPSHOT
@@ -28,23 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Starter {
     public static void main(String[] args) {
-//        var code = new CommandLine(new Console()).execute(args);
-//        System.exit(code);
-
-        new Thread(()->{
-            try {
-                TimeUnit.SECONDS.sleep(2);
-                System.out.println();
-                System.out.println();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("success...");
+        var code = new CommandLine(new Console()).execute(args);
+        System.exit(code);
     }
 }
